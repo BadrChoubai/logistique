@@ -6,7 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/BadrChoubai/logistique/internal/middleware"
+	"github.com/BadrChoubai/logistique"
+	"github.com/BadrChoubai/logistique/middleware"
 )
 
 // okHandler is a trivial downstream that always returns 200.
@@ -24,7 +25,7 @@ func newRequest(method, path, remoteAddr, xff string) *http.Request {
 }
 
 func TestRateLimit_AllowsWithinBurst(t *testing.T) {
-	cfg := middleware.RateLimitConfig{RequestsPerSecond: 1, Burst: 5}
+	cfg := logistique.RateLimitConfig{RequestsPerSecond: 1, Burst: 5}
 	handler := middleware.RateLimit(cfg)(okHandler)
 
 	for i := range 5 {
@@ -37,7 +38,7 @@ func TestRateLimit_AllowsWithinBurst(t *testing.T) {
 }
 
 func TestRateLimit_BlocksAfterBurstExhausted(t *testing.T) {
-	cfg := middleware.RateLimitConfig{RequestsPerSecond: 1, Burst: 3}
+	cfg := logistique.RateLimitConfig{RequestsPerSecond: 1, Burst: 3}
 	handler := middleware.RateLimit(cfg)(okHandler)
 
 	ip := "10.0.0.2:9999"
@@ -61,7 +62,7 @@ func TestRateLimit_BlocksAfterBurstExhausted(t *testing.T) {
 }
 
 func TestRateLimit_429ResponseIsJSON(t *testing.T) {
-	cfg := middleware.RateLimitConfig{RequestsPerSecond: 0.001, Burst: 1}
+	cfg := logistique.RateLimitConfig{RequestsPerSecond: 0.001, Burst: 1}
 	handler := middleware.RateLimit(cfg)(okHandler)
 
 	ip := "10.0.0.3:1111"
@@ -96,7 +97,7 @@ func TestRateLimit_429ResponseIsJSON(t *testing.T) {
 // TestRateLimit_IsolationByRoute verifies that two different routes for the
 // same IP maintain independent buckets.
 func TestRateLimit_IsolationByRoute(t *testing.T) {
-	cfg := middleware.RateLimitConfig{RequestsPerSecond: 1, Burst: 1}
+	cfg := logistique.RateLimitConfig{RequestsPerSecond: 1, Burst: 1}
 	handler := middleware.RateLimit(cfg)(okHandler)
 
 	ip := "10.0.0.4:2222"
@@ -115,7 +116,7 @@ func TestRateLimit_IsolationByRoute(t *testing.T) {
 // TestRateLimit_IsolationByIP verifies that two different IPs on the same
 // route maintain independent buckets.
 func TestRateLimit_IsolationByIP(t *testing.T) {
-	cfg := middleware.RateLimitConfig{RequestsPerSecond: 1, Burst: 1}
+	cfg := logistique.RateLimitConfig{RequestsPerSecond: 1, Burst: 1}
 	handler := middleware.RateLimit(cfg)(okHandler)
 
 	path := "/api/resource"
@@ -134,7 +135,7 @@ func TestRateLimit_IsolationByIP(t *testing.T) {
 // TestRateLimit_XForwardedFor checks that the middleware correctly uses
 // the first address in an X-Forwarded-For header for keying.
 func TestRateLimit_XForwardedFor(t *testing.T) {
-	cfg := middleware.RateLimitConfig{RequestsPerSecond: 1, Burst: 1}
+	cfg := logistique.RateLimitConfig{RequestsPerSecond: 1, Burst: 1}
 	handler := middleware.RateLimit(cfg)(okHandler)
 
 	path := "/api/resource"

@@ -6,16 +6,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/BadrChoubai/logistique"
 	"golang.org/x/time/rate"
 )
-
-// RateLimitConfig holds the token bucket parameters.
-type RateLimitConfig struct {
-	// RequestsPerSecond is the steady-state refill rate of the token bucket.
-	RequestsPerSecond float64
-	// Burst is the maximum number of requests allowed in an instant.
-	Burst int
-}
 
 // rateLimitError is the JSON body returned on 429 responses.
 type rateLimitError struct {
@@ -27,10 +20,10 @@ type rateLimitError struct {
 type ipRouteLimiter struct {
 	mu       sync.Mutex
 	limiters map[string]*rate.Limiter
-	config   RateLimitConfig
+	config   logistique.RateLimitConfig
 }
 
-func newIPRouteLimiter(cfg RateLimitConfig) *ipRouteLimiter {
+func newIPRouteLimiter(cfg logistique.RateLimitConfig) *ipRouteLimiter {
 	return &ipRouteLimiter{
 		limiters: make(map[string]*rate.Limiter),
 		config:   cfg,
@@ -60,11 +53,11 @@ func (irl *ipRouteLimiter) get(ip, route string) *rate.Limiter {
 //
 // Usage:
 //
-//	g.Use(middleware.RateLimit(middleware.RateLimitConfig{
+//	g.Use(middleware.RateLimit(logistique.RateLimitConfig{
 //	    RequestsPerSecond: 10,
 //	    Burst:             20,
 //	}))
-func RateLimit(cfg RateLimitConfig) func(http.Handler) http.Handler {
+func RateLimit(cfg logistique.RateLimitConfig) func(http.Handler) http.Handler {
 	irl := newIPRouteLimiter(cfg)
 
 	return func(next http.Handler) http.Handler {
