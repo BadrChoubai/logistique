@@ -1,0 +1,46 @@
+# Allowlisting gitignore template for GO projects prevents us
+# from adding various unwanted local files, such as generated
+# files, developer configurations or IDE-specific files etc.
+#
+# Ignore everything by default
+*
+
+# --- Allow git config ---
+!/.gitignore
+
+# --- Go source & module files ---
+!*.go
+!go.mod
+!go.sum
+
+# --- Documentation & metadata ---
+!README.md
+!LICENSE
+!ARCHITECTURE.md
+!Makefile
+
+# --- API (Swagger is part of source of truth) ---
+!api/
+!api/**
+
+# --- Project structure (services + internal logic) ---
+!cmd/
+!cmd/**
+!internal/
+!internal/**
+!migrations/
+!migrations/**
+migrations/.idea/
+
+# --- Infrastructure / deployment ---
+!manifests/
+!manifests/**
+!docker-compose.yaml
+!docker-compose.yml
+!.golangci.yml
+
+# --- Allow directory structure markers ---
+!.gitkeep
+
+# --- Allow directories themselves (required for allowlist to work properly) ---
+!*/
