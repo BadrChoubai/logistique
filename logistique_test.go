@@ -18,7 +18,7 @@ func TestGateway_ProxiesRequest(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("proxied response"))
+		_, _ = w.Write([]byte("proxied response"))
 	}))
 	defer upstream.Close()
 
@@ -45,7 +45,9 @@ func TestGateway_ProxiesRequest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	// Verify status
 	if resp.StatusCode != http.StatusOK {

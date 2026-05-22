@@ -20,7 +20,22 @@ type ServiceConfig struct {
 	// e.g. "http://journal:8081"
 	Target string
 
-	// Rewrite is ...
+	// If Rewrite is empty, the stripped path is forwarded as-is:
+	//
+	//	Prefix:  "/api/journal/"
+	//	Rewrite: ""
+	//	Request: /api/journal/entries/42
+	//	Upstream: /entries/42
+	//
+	// If Rewrite is set, the stripped path is mounted under Rewrite:
+	//
+	//	Prefix:  "/api/journal/"
+	//	Rewrite: "/v1"
+	//	Request: /api/journal/entries/42
+	//	Upstream: /v1/entries/42
+	//
+	// This is useful when the public gateway route differs from the upstream API
+	// structure.
 	Rewrite string
 }
 
@@ -82,8 +97,12 @@ func newProxy(target *url.URL, svc ServiceConfig) http.Handler {
 		Rewrite: func(r *httputil.ProxyRequest) {
 			r.SetURL(target)
 			r.Out.Host = target.Host
+
 			stripped := strings.TrimPrefix(r.In.URL.Path, svc.Prefix)
-			r.Out.URL.Path = svc.Rewrite + "/" + strings.TrimLeft(stripped, "/")
+			base := strings.TrimRight(svc.Rewrite, "/")
+			path := strings.TrimLeft(stripped, "/")
+
+			r.Out.URL.Path = base + "/" + path
 
 			r.Out.Header.Set("Accept", "application/json")
 			log.Printf("rewrite: %s -> %s%s", r.In.URL.Path, r.Out.Host, r.Out.URL.Path)
