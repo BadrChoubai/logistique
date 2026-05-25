@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/BadrChoubai/logistique"
+	"github.com/BadrChoubai/logistique/internal/config"
 )
 
 // This example proxies requests to JSONPlaceholder, a free fake REST API.
@@ -30,7 +31,7 @@ func main() {
 	defer stop()
 
 	gw, err := logistique.New(
-		logistique.Config{},
+		config.Config{},
 		logistique.ServiceConfig{
 			Prefix:  "/api/posts/",
 			Target:  "https://jsonplaceholder.typicode.com",

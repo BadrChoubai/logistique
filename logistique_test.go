@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/BadrChoubai/logistique"
+	"github.com/BadrChoubai/logistique/internal/config"
 )
 
 func TestGateway_ProxiesRequest(t *testing.T) {
@@ -18,13 +19,13 @@ func TestGateway_ProxiesRequest(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("proxied response"))
+		_, _ = w.Write([]byte("proxied response"))
 	}))
 	defer upstream.Close()
 
 	// Create gateway
 	gw, err := logistique.New(
-		logistique.Config{},
+		config.Config{},
 		logistique.ServiceConfig{
 			Prefix:  "/api/journal/",
 			Target:  upstream.URL,
@@ -45,7 +46,9 @@ func TestGateway_ProxiesRequest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	// Verify status
 	if resp.StatusCode != http.StatusOK {
