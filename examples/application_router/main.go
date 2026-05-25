@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/BadrChoubai/logistique"
+	"github.com/BadrChoubai/logistique/internal/config"
 	"github.com/BadrChoubai/logistique/middleware"
 )
 
@@ -37,7 +38,7 @@ type AppConfig struct {
 
 	// Embed logistique's config so gateway settings live in one place and
 	// flow through cleanly without duplication.
-	Gateway logistique.Config
+	Gateway config.Config
 
 	// Upstream service base URLs.
 	ServiceOneURL string
@@ -47,8 +48,8 @@ type AppConfig struct {
 func defaultConfig() AppConfig {
 	return AppConfig{
 		Port: ":8080",
-		Gateway: logistique.Config{
-			RateLimit: logistique.RateLimitConfig{
+		Gateway: config.Config{
+			RateLimit: config.RateLimitConfig{
 				RequestsPerSecond: 10,
 				Burst:             20,
 			},

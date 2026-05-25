@@ -1,4 +1,4 @@
-package logistique
+package config
 
 type Config struct {
 	RateLimit RateLimitConfig

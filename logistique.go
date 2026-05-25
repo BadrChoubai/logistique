@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/BadrChoubai/logistique/internal/config"
 	"github.com/BadrChoubai/logistique/internal/router"
 )
 
@@ -49,7 +50,7 @@ type Gateway struct {
 	services    []ServiceConfig
 }
 
-func New(config Config, services ...ServiceConfig) (*Gateway, error) {
+func New(config config.Config, services ...ServiceConfig) (*Gateway, error) {
 	g := &Gateway{rtr: router.NewRouter()}
 
 	for _, svc := range services {

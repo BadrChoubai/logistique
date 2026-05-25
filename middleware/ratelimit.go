@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/BadrChoubai/logistique"
+	"github.com/BadrChoubai/logistique/internal/config"
 	"golang.org/x/time/rate"
 )
 
@@ -20,10 +20,10 @@ type rateLimitError struct {
 type ipRouteLimiter struct {
 	mu       sync.Mutex
 	limiters map[string]*rate.Limiter
-	config   logistique.RateLimitConfig
+	config   config.RateLimitConfig
 }
 
-func newIPRouteLimiter(cfg logistique.RateLimitConfig) *ipRouteLimiter {
+func newIPRouteLimiter(cfg config.RateLimitConfig) *ipRouteLimiter {
 	return &ipRouteLimiter{
 		limiters: make(map[string]*rate.Limiter),
 		config:   cfg,
@@ -57,7 +57,7 @@ func (irl *ipRouteLimiter) get(ip, route string) *rate.Limiter {
 //	    RequestsPerSecond: 10,
 //	    Burst:             20,
 //	}))
-func RateLimit(cfg logistique.RateLimitConfig) func(http.Handler) http.Handler {
+func RateLimit(cfg config.RateLimitConfig) func(http.Handler) http.Handler {
 	irl := newIPRouteLimiter(cfg)
 
 	return func(next http.Handler) http.Handler {

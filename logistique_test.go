@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/BadrChoubai/logistique"
+	"github.com/BadrChoubai/logistique/internal/config"
 )
 
 func TestGateway_ProxiesRequest(t *testing.T) {
@@ -24,7 +25,7 @@ func TestGateway_ProxiesRequest(t *testing.T) {
 
 	// Create gateway
 	gw, err := logistique.New(
-		logistique.Config{},
+		config.Config{},
 		logistique.ServiceConfig{
 			Prefix:  "/api/journal/",
 			Target:  upstream.URL,

@@ -10,7 +10,16 @@ GO := $(if $(GOVERSION),$(GOVERSION),$(shell GOTOOLCHAIN=local go env GOVERSION)
 
 SHELL := /usr/bin/env bash -o errexit -o pipefail -o nounset
 GOFLAGS ?=
+
+# Versioning 
 VERSION ?= $(shell git describe --tags --always --dirty)
+COMMIT  ?= $(shell git rev-parse --short HEAD)
+DATE    ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+LDFLAGS := -ldflags "\
+	-X 'github.com/BadrChoubai/logistique/internal/version.Version=$(VERSION)' \
+	-X 'github.com/BadrChoubai/logistique/internal/version.Commit=$(COMMIT)' \
+	-X 'github.com/BadrChoubai/logistique/internal/version.Date=$(DATE)'"
 
 
 all: # @HELP build container image 
@@ -19,7 +28,7 @@ all: build
 
 build: # @HELP build app for local development
 build: deps ci $(BUILD_DIRS)
-	go build -o bin/logistique logistique.go
+	go build $(LDFLAGS) -o bin/logistique logistique.go
 
 
 $(BUILD_DIRS):
